@@ -56,13 +56,29 @@ database.ref().on("child_added", function(snapshot) {
     // Log everything that's coming out of snapshot
     
     console.log(snapshot.val());
-    console.log(snapshot.val().trainName);
-    console.log(snapshot.val().destination);
-    console.log(snapshot.val().trainTime);
-    console.log(snapshot.val().frequency);
+   let tName = console.log(snapshot.val().trainName);
+   let tDesi = console.log(snapshot.val().destination);
+     let trainT = console.log(snapshot.val().trainTime);
+    let tFrequency = console.log(snapshot.val().frequency);
+
+    let trainArr = trainT.split(':');
+    let trainMin = moment().hours(trainArr[0]).minutes(trainArr[1]);
+    let maxMoment = moment.max(moment(), trainMin);
+    let tMinutes;
+    let tArrival;
+
+    if (maxMoment === trainMin) {
+      tArrival = trainMin.format("hh:mm A");
+      tMinutes = trainMin.diff(moment(), "minutes");
+    } else {
+      let differenceTimes = moment().diff(trainMin, "minutes");
+      let tRemainder = differenceTimes % tFrequency;
+      tMinutes = tFrequency - tRemainder;
+      tArrival = moment().add(tMinutes, "m").format("mm:hh A");
+    }
 
 
-    $("#js-display-data").prepend("<tr class='js-row'><td class='name-display'> " + snapshot.val().trainName + "</td><td class='destination-display'> " + snapshot.val().destination + "</td><td class='trainTime-display'>  " + snapshot.val().trainTime + "</td><td class='frequency-display'>" + snapshot.val().frequency + "</td><td class='minutes-display'> " + 'minutes' + " </td></tr>");
+    $("#js-display-data").prepend("<tr class='js-row'><td class='name-display'> " + tName + "</td><td class='destination-display'> " + tDesi + "</td><td class='frequency-display'>  " + tFrequency + "</td><td class='arrival-display'>" + tArrival + "</td><td class='minutesAway-display'> " + tMinutes + " </td></tr>");
 
 }, function(errorObject) {
    console.log("Errors handled: " + errorObject.code);
